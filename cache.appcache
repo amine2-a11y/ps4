@@ -1,9 +1,7 @@
 CACHE MANIFEST
-# UI-only offline cache
+# UI-only offline cache test v2
 CACHE:
 index.html
-offline-test.html
-background-music.js
-README.md
+
 NETWORK:
 *
