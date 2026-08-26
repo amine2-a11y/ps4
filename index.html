@@ -112,11 +112,22 @@
       return;
     }
 
+    // If the manifest was already processed before this page installed
+    // its event listeners, AppCache will already be IDLE/UPDATEREADY and
+    // no 'cached' event will arrive again. Handle that state explicitly.
+    if (ac.status === window.applicationCache.IDLE) {
+      ready('offline cache ready');
+      return;
+    }
+    if (ac.status === window.applicationCache.UPDATEREADY) {
+      ready('offline cache updated');
+      return;
+    }
+
     render('checking offline cache...', '', 0);
 
-    // The PS4 browser may omit AppCache progress events. Show honest
-    // progress up to 90%, then explicitly report that the browser is
-    // finalizing instead of leaving an unexplained spinner.
+    // Older browsers may omit AppCache progress events. Do not pretend
+    // that 90% means completion; wait for the real AppCache terminal event.
     timer = setInterval(function () {
       if (done) return;
       waited += 180;
