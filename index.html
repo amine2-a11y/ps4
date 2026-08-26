@@ -3,23 +3,28 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JAILBREAK PS4 AMINE</title>
+<title>ADMIRAL WEBKIT 6.72 - 13.00</title>
 <style>
-  /* Interface statis: خلفية Zombie + status exploit + spinner loading. */
+  /* Halaman statis (tanpa animasi): PNG utuh Sanji Diable Jambe buatan user
+     di tengah layar + status exploit + spinner loading bulat.
+     Elemen wajib chain TIDAK diubah: #state, #out, import chain_poops.js. */
   *{box-sizing:border-box}
   html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#07090d}
   body{font-family:Impact,Haettenschweiler,"Arial Narrow Bold",sans-serif}
 
-  /* خلفية Zombie احترافية. */
+  /* Gambar mengisi layar (rasio asli dijaga), glow halus statis. */
   #art{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-       width:100vw;height:100vh;object-fit:cover;z-index:1;
-       filter:brightness(.72) contrast(1.08)}
+       max-width:100vw;max-height:100vh;z-index:1;
+       filter:drop-shadow(0 0 24px rgba(255,94,0,.18))}
 
   /* HUD status exploit di bawah tengah. */
   #hud{position:absolute;left:50%;bottom:4vh;transform:translateX(-50%);
        z-index:12;text-align:center;pointer-events:none}
   #brand{font-size:11px;font-weight:700;letter-spacing:.22em;color:#fff;
          text-shadow:0 1px 4px rgba(0,0,0,.95)}
+  #credits{margin-top:5px;font:10px/1.25 Arial,sans-serif;color:#fff;
+           text-shadow:0 1px 4px rgba(0,0,0,.95);
+           letter-spacing:.03em;white-space:nowrap}
   #cache{margin-top:5px;font:11px/1.25 Arial,sans-serif;color:#728095;
          min-height:14px;letter-spacing:.04em}
   #cache.ok{color:#68aa83}
@@ -47,10 +52,11 @@
 </style>
 </head>
 <body>
-<img id="art" src="zombie_bg.png" alt="Zombie background">
+<img id="art" src="sanji.png" alt="Sanji Diable Jambe">
 <div id="hud">
-  <div id="brand">JAILBREAK PS4 AMINE</div>
-<div id="cache">checking offline cache...</div>
+  <div id="brand">ADMIRAL WEBKIT 6.72 - 13.00</div>
+  <div id="credits">Special thanks to sonicps, egycnq, Theflow0, sleirsgoevy, abc, Al-Azif, ntfargo, zecoxao, slopkit &amp; contributors</div>
+  <div id="cache">checking offline cache...</div>
   <div id="state">detecting firmware...</div>
   <div id="spin"></div>
 </div>
