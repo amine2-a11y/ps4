@@ -1,0 +1,18 @@
+<!doctype html><meta charset="utf-8"><title>Offline Cache Test</title>
+<style>body{font-family:sans-serif;margin:30px}#bar{height:18px;border:1px solid #888}#fill{height:100%;width:0;background:#888}li{margin:8px 0}</style>
+<h1>Offline UI Cache Test</h1><p id="status">Checking cache…</p><div id="bar"><div id="fill"></div></div><ul id="checks"></ul>
+<script>
+(function(){
+ const s=document.getElementById('status'),f=document.getElementById('fill'),c=document.getElementById('checks');
+ function add(x){const li=document.createElement('li');li.textContent=x;c.appendChild(li)}
+ add('Page loaded: OK'); f.style.width='25%';
+ const ac=window.applicationCache;
+ if(!ac){s.textContent='ApplicationCache unavailable';f.style.width='100%';add('Use a service-worker-capable browser for modern offline caching.');return}
+ const names=['cache.appcache','index.html']; let done=0;
+ function finish(){done++;f.style.width=(25+done*37.5)+'%';if(done>=2){s.textContent='Offline UI cache check complete';add('Cache status: '+ac.status);f.style.width='100%'}}
+ try{add('ApplicationCache status: '+ac.status);finish();}catch(e){add('Cache status check failed: '+e.message)}
+ window.addEventListener('online',()=>s.textContent='Online');
+ window.addEventListener('offline',()=>s.textContent='Offline — UI remains available if cached');
+ ['cached','noupdate','updateready','obsolete','error'].forEach(ev=>ac.addEventListener(ev,()=>{add('AppCache event: '+ev); if(ev==='cached'||ev==='noupdate'||ev==='updateready'){s.textContent='Offline UI cache ready';f.style.width='100%'}}));
+})();
+</script>

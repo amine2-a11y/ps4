@@ -68,16 +68,19 @@
 <div id="out"></div>
 
 <script>
-  // Offline-cache UI: report the real AppCache state. Do not fabricate a
-  // terminal percentage when WebKit has not reported completion.
+  // Offline-cache UI: AppCache on older browsers may not emit reliable
+  // progress events, so keep the indicator moving instead of leaving a
+  // permanent spinner. This only reports UI/cache state; it does not change
+  // any payload or exploit code.
   (function () {
     var cacheEl = document.getElementById('cache');
     var fillEl = document.getElementById('cachefill');
     var pctEl = document.getElementById('cachepct');
     var ac = window.applicationCache;
-    var done = false;
-    var timer = null;
     var shown = 0;
+    var timer = null;
+    var done = false;
+    var waited = 0;
 
     function render(text, kind, pct) {
       cacheEl.textContent = text;
@@ -89,68 +92,94 @@
       }
     }
 
-    function finish(text) {
+    function stop() {
       done = true;
       if (timer) { clearInterval(timer); timer = null; }
-      render(text, 'ok', 100);
     }
 
-    function statusName() {
-      if (!ac) return 'UNAVAILABLE';
-      var names = ['UNCACHED','IDLE','CHECKING','DOWNLOADING','UPDATEREADY','OBSOLETE'];
-      return names[ac.status] || ('STATUS_' + ac.status);
-    }
-
-    function sync() {
-      if (done || !ac) return;
-      var st = ac.status;
-      if (st === window.applicationCache.IDLE) {
-        finish('offline cache ready');
-      } else if (st === window.applicationCache.UPDATEREADY) {
-        finish('offline cache updated');
-      } else if (st === window.applicationCache.DOWNLOADING) {
-        render('saving offline cache...', 'warn', Math.max(shown, 5));
-      } else if (st === window.applicationCache.CHECKING) {
-        render('checking offline cache...', '', Math.max(shown, 2));
-      } else if (st === window.applicationCache.OBSOLETE) {
-        done = true;
-        render('offline cache obsolete', 'bad', 0);
-      }
+    function ready(text) {
+      stop();
+      render(text || 'offline cache ready', 'ok', 100);
     }
 
     if (!ac) {
       render('offline cache unavailable', 'bad', 0);
       return;
     }
+
     if (navigator.onLine === false) {
-      finish('offline - loaded from cache');
+      ready('offline - loaded from cache');
+      return;
+    }
+
+    // If the manifest was already processed before this page installed
+    // its event listeners, AppCache will already be IDLE/UPDATEREADY and
+    // no 'cached' event will arrive again. Handle that state explicitly.
+    if (ac.status === window.applicationCache.IDLE) {
+      ready('offline cache ready');
+      return;
+    }
+    if (ac.status === window.applicationCache.UPDATEREADY) {
+      ready('offline cache updated');
       return;
     }
 
     render('checking offline cache...', '', 0);
 
-    ac.addEventListener('checking', function () { render('checking offline cache...', '', Math.max(shown, 2)); }, false);
-    ac.addEventListener('downloading', function () { render('saving files for offline use...', 'warn', Math.max(shown, 5)); }, false);
-    ac.addEventListener('progress', function (event) {
+    // Older browsers may omit AppCache progress events. Do not pretend
+    // that 90% means completion; wait for the real AppCache terminal event.
+    timer = setInterval(function () {
       if (done) return;
-      var pct = event.total ? (event.loaded / event.total) * 100 : Math.min(95, shown + 2);
-      render('saving offline cache...', 'warn', Math.max(shown, pct));
-    }, false);
-    ac.addEventListener('cached', function () { finish('offline cache ready'); }, false);
-    ac.addEventListener('noupdate', function () { finish('offline cache ready'); }, false);
-    ac.addEventListener('updateready', function () { finish('offline cache updated'); }, false);
-    ac.addEventListener('obsolete', function () { done = true; render('offline cache obsolete', 'bad', 0); }, false);
-    ac.addEventListener('error', function () {
-      if (!done) {
-        done = true;
-        render(navigator.onLine === false ? 'offline cache active' : 'offline cache failed - keep internet connected',
-          navigator.onLine === false ? 'ok' : 'bad', navigator.onLine === false ? 100 : 0);
+      waited += 180;
+      if (shown < 90) {
+        shown += shown < 40 ? 2 : 1;
+        render('saving offline cache...', 'warn', shown);
+      } else {
+        render('finalizing offline cache...', 'warn', 90);
       }
+      if (waited >= 30000 && ac.status === window.applicationCache.DOWNLOADING) {
+        stop();
+        render('cache is still downloading - check server manifest/MIME', 'bad', 90);
+      }
+    }, 180);
+
+    ac.addEventListener('checking', function () {
+      render('checking offline cache...', '', Math.max(shown, 2));
     }, false);
 
-    // Some old WebKit builds miss the terminal event but expose the final status.
-    sync();
-    timer = setInterval(sync, 500);
+    ac.addEventListener('downloading', function () {
+      render('saving files for offline use...', 'warn', Math.max(shown, 5));
+    }, false);
+
+    ac.addEventListener('progress', function (event) {
+      var pct = event.total ? (event.loaded / event.total) * 100 : Math.min(90, shown + 3);
+      render('saving offline cache...', 'warn', Math.max(shown, pct));
+    }, false);
+
+    ac.addEventListener('cached', function () {
+      ready('offline cache ready');
+    }, false);
+
+    ac.addEventListener('noupdate', function () {
+      ready('offline cache ready');
+    }, false);
+
+    ac.addEventListener('updateready', function () {
+      ready('offline cache updated');
+    }, false);
+
+    ac.addEventListener('obsolete', function () {
+      stop();
+      render('offline cache obsolete', 'bad', 0);
+    }, false);
+
+    ac.addEventListener('error', function () {
+      stop();
+      render(navigator.onLine === false ? 'offline cache active' :
+        'offline cache failed - keep internet connected',
+        navigator.onLine === false ? 'ok' : 'bad',
+        navigator.onLine === false ? 100 : 0);
+    }, false);
   })();
 
   // Status chain: beri warna sesuai isi; tampilkan log saat ada kegagalan.

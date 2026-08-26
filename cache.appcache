@@ -1,13 +1,9 @@
 CACHE MANIFEST
-# ADMIRAL UI offline cache
-# Version: 17-ui-cache-minimal
-
+# UI-only offline cache
 CACHE:
 index.html
+offline-test.html
 background-music.js
-firmware-matrix.js
-multifw-router.js
-sanji.png
-
+README.md
 NETWORK:
 *
