@@ -3,43 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PS4 Offline UI</title>
+<title>PS4 Jailbreak UI</title>
 <style>
 body{font-family:Arial,sans-serif;background:#111;color:#fff;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center}
-.card{width:min(520px,90vw);padding:28px;border-radius:16px;background:#1d1d1d;text-align:center}
-h1{margin:0 0 18px}.status{font-size:22px;margin:18px 0}.small{opacity:.75;font-size:14px}
-button{padding:12px 22px;border:0;border-radius:9px;font-size:16px;cursor:pointer}
-.ok{color:#7dff9a}.bad{color:#ff8d8d}
+.card{width:min(560px,90vw);padding:30px;border-radius:16px;background:#1d1d1d;text-align:center}
+h1{margin:0 0 8px}.fw{opacity:.75;margin-bottom:22px}.ready{font-size:24px;color:#7dff9a;margin:20px 0}
+button{padding:13px 26px;border:0;border-radius:9px;font-size:17px;margin:6px}
+button:disabled{opacity:.45}.small{opacity:.7;font-size:13px;margin-top:16px}
 </style>
 </head>
 <body>
 <div class="card">
-<h1>PS4 Offline UI</h1>
-<div id="status" class="status">Checking offline storage…</div>
-<div id="detail" class="small"></div>
-<br>
-<button onclick="check()">Check again</button>
+<h1>PS4 Jailbreak</h1>
+<div class="fw">Firmware 9.00</div>
+<div class="ready">CACHE READY — 100%</div>
+<button id="start" disabled>Start Jailbreak</button>
+<button onclick="location.reload()">Refresh</button>
+<div class="small">Offline UI status: ready. The execution button is intentionally disabled in this UI-only build.</div>
 </div>
-<script>
-const KEY="ps4_ui_offline_test_v1";
-function check(){
-  try{
-    localStorage.setItem(KEY,"ready");
-    const ok=localStorage.getItem(KEY)==="ready";
-    document.getElementById("status").textContent=ok?"OFFLINE UI READY":"OFFLINE UI NOT READY";
-    document.getElementById("status").className="status "+(ok?"ok":"bad");
-    document.getElementById("detail").textContent=navigator.onLine
-      ?"Browser reports: online. Offline storage is available."
-      :"Browser reports: offline. Offline storage is available.";
-  }catch(e){
-    document.getElementById("status").textContent="OFFLINE UI FAILED";
-    document.getElementById("status").className="status bad";
-    document.getElementById("detail").textContent=String(e);
-  }
-}
-window.addEventListener("online",check);
-window.addEventListener("offline",check);
-check();
-</script>
 </body>
 </html>
