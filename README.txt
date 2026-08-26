@@ -1,4 +1,1 @@
-UI-only offline cache test.
-This package contains no kernel payload, exploit chain, or firmware toolchain.
-It intentionally does not use a synthetic 90% progress state.
-The server must serve cache.appcache with Content-Type: text/cache-manifest for AppCache to activate.
+UI-only offline test. Original PS4 files are not modified. This package tests local browser storage and does not contain exploit/kernel/payload code.

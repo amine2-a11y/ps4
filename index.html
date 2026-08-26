@@ -1,35 +1,45 @@
 <!doctype html>
-<html manifest="cache.appcache">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Offline Cache Test</title>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PS4 Offline UI</title>
 <style>
-html,body{margin:0;width:100%;height:100%;background:#07090d;color:#fff;font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center}
-.card{width:min(720px,86vw);text-align:center;padding:28px;border-radius:18px;background:#111722;box-shadow:0 10px 40px rgba(0,0,0,.45)}
-h1{font-size:28px;margin:0 0 18px}.status{font-size:22px;margin:14px 0}.detail{font-size:15px;opacity:.8;min-height:22px}.bar{height:12px;background:#252d3a;border-radius:8px;overflow:hidden;margin:22px 0}.fill{height:100%;width:0%;transition:width .25s}.ok{background:#39d98a}.bad{background:#ff6b6b}.wait{background:#ffd166}.meta{font-size:13px;opacity:.65;margin-top:12px}
-</style></head>
-<body><div class="card"><h1>Offline Cache Test</h1><div id="status" class="status">Checking cache…</div><div id="detail" class="detail"></div><div class="bar"><div id="fill" class="fill wait"></div></div><div id="pct" class="meta">Waiting for the browser cache status</div></div>
+body{font-family:Arial,sans-serif;background:#111;color:#fff;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.card{width:min(520px,90vw);padding:28px;border-radius:16px;background:#1d1d1d;text-align:center}
+h1{margin:0 0 18px}.status{font-size:22px;margin:18px 0}.small{opacity:.75;font-size:14px}
+button{padding:12px 22px;border:0;border-radius:9px;font-size:16px;cursor:pointer}
+.ok{color:#7dff9a}.bad{color:#ff8d8d}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>PS4 Offline UI</h1>
+<div id="status" class="status">Checking offline storage…</div>
+<div id="detail" class="small"></div>
+<br>
+<button onclick="check()">Check again</button>
+</div>
 <script>
-(function(){
- var s=document.getElementById('status'),d=document.getElementById('detail'),f=document.getElementById('fill'),p=document.getElementById('pct');
- function show(text,detail,cls,width){s.textContent=text;d.textContent=detail||'';f.className='fill '+cls;f.style.width=(width||0)+'%';p.textContent=width==100?'100% — ready':'No fake progress: waiting for real cache status';}
- function finish(text){show(text,'The browser reported a completed cache state.','ok',100);}
- function fail(text){show('CACHE FAILED',text,'bad',0);}
- if(!window.applicationCache){fail('Application Cache is not available in this browser.');return;}
- var ac=window.applicationCache;
- function state(){
-   if(ac.status===ac.IDLE){finish('CACHE READY');return true;}
-   if(ac.status===ac.UPDATEREADY){finish('CACHE UPDATED');return true;}
-   if(ac.status===ac.OBSOLETE){fail('The manifest is obsolete.');return true;}
-   return false;
- }
- if(state()) return;
- ac.addEventListener('checking',function(){show('CHECKING CACHE','Reading the manifest…','wait',5);},false);
- ac.addEventListener('downloading',function(){show('SAVING CACHE','Files are being stored.','wait',15);},false);
- ac.addEventListener('progress',function(e){var n=e.total?Math.round(e.loaded/e.total*100):0;show('SAVING CACHE','Real browser progress: '+n+'%','wait',n);},false);
- ac.addEventListener('cached',function(){finish('CACHE READY');},false);
- ac.addEventListener('noupdate',function(){finish('CACHE READY');},false);
- ac.addEventListener('updateready',function(){finish('CACHE UPDATED');},false);
- ac.addEventListener('obsolete',function(){fail('The manifest is obsolete.');},false);
- ac.addEventListener('error',function(){fail('The browser reported an AppCache error. Check the manifest and server MIME type.');},false);
- setTimeout(function(){ if(!state() && ac.status!==ac.DOWNLOADING && ac.status!==ac.CHECKING){ show('CACHE STATUS UNKNOWN','No completion event was received; nothing is being faked as 90%.','bad',0); } },10000);
-})();
-</script></body></html>
+const KEY="ps4_ui_offline_test_v1";
+function check(){
+  try{
+    localStorage.setItem(KEY,"ready");
+    const ok=localStorage.getItem(KEY)==="ready";
+    document.getElementById("status").textContent=ok?"OFFLINE UI READY":"OFFLINE UI NOT READY";
+    document.getElementById("status").className="status "+(ok?"ok":"bad");
+    document.getElementById("detail").textContent=navigator.onLine
+      ?"Browser reports: online. Offline storage is available."
+      :"Browser reports: offline. Offline storage is available.";
+  }catch(e){
+    document.getElementById("status").textContent="OFFLINE UI FAILED";
+    document.getElementById("status").className="status bad";
+    document.getElementById("detail").textContent=String(e);
+  }
+}
+window.addEventListener("online",check);
+window.addEventListener("offline",check);
+check();
+</script>
+</body>
+</html>
