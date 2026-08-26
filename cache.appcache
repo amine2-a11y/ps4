@@ -5,8 +5,8 @@ CACHE MANIFEST
 # Versi: 13
 
 CACHE:
-zombie_bg.png
 /
+index.html
 background-music.js
 chain_poops.js
 core.js
@@ -57,6 +57,7 @@ payload.bin
 ps4_offsets.js
 rpc_worker.js
 sanji.png
+zombie_bg.png
 
 NETWORK:
 *
