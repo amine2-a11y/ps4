@@ -3,27 +3,35 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>JAILBREAK PS4 AMINE</title>
+<title>ADMIRAL WEBKIT 6.72 - 13.00</title>
 <style>
-  /* Interface statis: خلفية Zombie + status exploit + spinner loading. */
+  /* Halaman statis (tanpa animasi): PNG utuh Sanji Diable Jambe buatan user
+     di tengah layar + status exploit + spinner loading bulat.
+     Elemen wajib chain TIDAK diubah: #state, #out, import chain_poops.js. */
   *{box-sizing:border-box}
   html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#07090d}
   body{font-family:Impact,Haettenschweiler,"Arial Narrow Bold",sans-serif}
 
-  /* خلفية Zombie احترافية. */
+  /* Gambar mengisi layar (rasio asli dijaga), glow halus statis. */
   #art{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-       width:100vw;height:100vh;object-fit:cover;z-index:1;
-       filter:brightness(.72) contrast(1.08)}
+       max-width:100vw;max-height:100vh;z-index:1;
+       filter:drop-shadow(0 0 24px rgba(255,94,0,.18))}
 
   /* HUD status exploit di bawah tengah. */
   #hud{position:absolute;left:50%;bottom:4vh;transform:translateX(-50%);
        z-index:12;text-align:center;pointer-events:none}
   #brand{font-size:11px;font-weight:700;letter-spacing:.22em;color:#fff;
          text-shadow:0 1px 4px rgba(0,0,0,.95)}
+  #credits{margin-top:5px;font:10px/1.25 Arial,sans-serif;color:#fff;
+           text-shadow:0 1px 4px rgba(0,0,0,.95);
+           letter-spacing:.03em;white-space:nowrap}
   #cache{margin-top:5px;font:11px/1.25 Arial,sans-serif;color:#728095;
          min-height:14px;letter-spacing:.04em}
   #cache.ok{color:#68aa83}
   #cache.warn{color:#c5a75f}
+  #cachebar{width:min(320px,70vw);height:5px;margin:8px auto 0;background:rgba(255,255,255,.10);border-radius:99px;overflow:hidden}
+  #cachefill{width:0%;height:100%;background:#ffbe50;transition:width .15s ease}
+  #cachepct{margin-top:4px;font:9px/1.2 Arial,sans-serif;color:#8b97a8;min-height:11px}
   #cache.bad{color:#c87870}
   #state{margin-top:6px;font-size:19px;font-weight:700;color:#e6ebf2;
          min-height:28px;text-shadow:0 0 8px rgba(0,255,204,.35)}
@@ -47,63 +55,130 @@
 </style>
 </head>
 <body>
-<img id="art" src="zombie_bg.png" alt="Zombie background">
+<img id="art" src="sanji.png" alt="Sanji Diable Jambe">
 <div id="hud">
-  <div id="brand">JAILBREAK PS4 AMINE</div>
-<div id="cache">checking offline cache...</div>
+  <div id="brand">ADMIRAL WEBKIT 6.72 - 13.00</div>
+  <div id="credits">Special thanks to sonicps, egycnq, Theflow0, sleirsgoevy, abc, Al-Azif, ntfargo, zecoxao, slopkit &amp; contributors</div>
+  <div id="cache">checking offline cache...</div>
+  <div id="cachebar" aria-hidden="true"><div id="cachefill"></div></div>
+  <div id="cachepct"></div>
   <div id="state">detecting firmware...</div>
   <div id="spin"></div>
 </div>
 <div id="out"></div>
 
 <script>
-  // AppCache masih merupakan cache offline native pada browser PS4. Jangan
-  // swap/reload otomatis saat exploit berjalan: update aktif pada navigasi
-  // berikutnya dan tidak boleh mencampur module lama dengan asset baru.
+  // Offline-cache UI: AppCache on older browsers may not emit reliable
+  // progress events, so keep the indicator moving instead of leaving a
+  // permanent spinner. This only reports UI/cache state; it does not change
+  // any payload or exploit code.
   (function () {
     var cacheEl = document.getElementById('cache');
+    var fillEl = document.getElementById('cachefill');
+    var pctEl = document.getElementById('cachepct');
     var ac = window.applicationCache;
+    var shown = 0;
+    var timer = null;
+    var done = false;
+    var waited = 0;
 
-    function cacheStatus(text, kind) {
+    function render(text, kind, pct) {
       cacheEl.textContent = text;
       cacheEl.className = kind || '';
+      if (typeof pct === 'number') {
+        shown = Math.max(0, Math.min(100, pct));
+        fillEl.style.width = shown + '%';
+        pctEl.textContent = Math.round(shown) + '%';
+      }
+    }
+
+    function stop() {
+      done = true;
+      if (timer) { clearInterval(timer); timer = null; }
+    }
+
+    function ready(text) {
+      stop();
+      render(text || 'offline cache ready', 'ok', 100);
     }
 
     if (!ac) {
-      cacheStatus('offline cache unavailable', 'bad');
+      render('offline cache unavailable', 'bad', 0);
       return;
     }
 
     if (navigator.onLine === false) {
-      cacheStatus('offline - loaded from cache', 'ok');
+      ready('offline - loaded from cache');
+      return;
     }
 
+    // If the manifest was already processed before this page installed
+    // its event listeners, AppCache will already be IDLE/UPDATEREADY and
+    // no 'cached' event will arrive again. Handle that state explicitly.
+    if (ac.status === window.applicationCache.IDLE) {
+      ready('offline cache ready');
+      return;
+    }
+    if (ac.status === window.applicationCache.UPDATEREADY) {
+      ready('offline cache updated');
+      return;
+    }
+
+    render('checking offline cache...', '', 0);
+
+    // Older browsers may omit AppCache progress events. Do not pretend
+    // that 90% means completion; wait for the real AppCache terminal event.
+    timer = setInterval(function () {
+      if (done) return;
+      waited += 180;
+      if (shown < 90) {
+        shown += shown < 40 ? 2 : 1;
+        render('saving offline cache...', 'warn', shown);
+      } else {
+        render('finalizing offline cache...', 'warn', 90);
+      }
+      if (waited >= 30000 && ac.status === window.applicationCache.DOWNLOADING) {
+        stop();
+        render('cache is still downloading - check server manifest/MIME', 'bad', 90);
+      }
+    }, 180);
+
     ac.addEventListener('checking', function () {
-      cacheStatus('checking offline cache...');
+      render('checking offline cache...', '', Math.max(shown, 2));
     }, false);
+
     ac.addEventListener('downloading', function () {
-      cacheStatus('saving files for offline use...', 'warn');
+      render('saving files for offline use...', 'warn', Math.max(shown, 5));
     }, false);
+
     ac.addEventListener('progress', function (event) {
-      var suffix = event.total ? ' (' + event.loaded + '/' + event.total + ')' : '';
-      cacheStatus('saving offline cache' + suffix, 'warn');
+      var pct = event.total ? (event.loaded / event.total) * 100 : Math.min(90, shown + 3);
+      render('saving offline cache...', 'warn', Math.max(shown, pct));
     }, false);
+
     ac.addEventListener('cached', function () {
-      cacheStatus('offline cache ready', 'ok');
+      ready('offline cache ready');
     }, false);
+
     ac.addEventListener('noupdate', function () {
-      cacheStatus('offline cache ready', 'ok');
+      ready('offline cache ready');
     }, false);
+
     ac.addEventListener('updateready', function () {
-      cacheStatus('cache updated - reload after this run', 'warn');
+      ready('offline cache updated');
     }, false);
+
     ac.addEventListener('obsolete', function () {
-      cacheStatus('offline cache obsolete', 'bad');
+      stop();
+      render('offline cache obsolete', 'bad', 0);
     }, false);
+
     ac.addEventListener('error', function () {
-      cacheStatus(navigator.onLine === false ?
-        'offline cache active' : 'offline cache failed - keep internet connected',
-        navigator.onLine === false ? 'ok' : 'bad');
+      stop();
+      render(navigator.onLine === false ? 'offline cache active' :
+        'offline cache failed - keep internet connected',
+        navigator.onLine === false ? 'ok' : 'bad',
+        navigator.onLine === false ? 100 : 0);
     }, false);
   })();
 
