@@ -29,6 +29,9 @@
          min-height:14px;letter-spacing:.04em}
   #cache.ok{color:#68aa83}
   #cache.warn{color:#c5a75f}
+  #cachebar{width:min(320px,70vw);height:5px;margin:8px auto 0;background:rgba(255,255,255,.10);border-radius:99px;overflow:hidden}
+  #cachefill{width:0%;height:100%;background:#ffbe50;transition:width .15s ease}
+  #cachepct{margin-top:4px;font:9px/1.2 Arial,sans-serif;color:#8b97a8;min-height:11px}
   #cache.bad{color:#c87870}
   #state{margin-top:6px;font-size:19px;font-weight:700;color:#e6ebf2;
          min-height:28px;text-shadow:0 0 8px rgba(0,255,204,.35)}
@@ -57,6 +60,8 @@
   <div id="brand">ADMIRAL WEBKIT 6.72 - 13.00</div>
   <div id="credits">Special thanks to sonicps, egycnq, Theflow0, sleirsgoevy, abc, Al-Azif, ntfargo, zecoxao, slopkit &amp; contributors</div>
   <div id="cache">checking offline cache...</div>
+  <div id="cachebar" aria-hidden="true"><div id="cachefill"></div></div>
+  <div id="cachepct"></div>
   <div id="state">detecting firmware...</div>
   <div id="spin"></div>
 </div>
@@ -68,48 +73,60 @@
   // berikutnya dan tidak boleh mencampur module lama dengan asset baru.
   (function () {
     var cacheEl = document.getElementById('cache');
+    var fillEl = document.getElementById('cachefill');
+    var pctEl = document.getElementById('cachepct');
     var ac = window.applicationCache;
 
-    function cacheStatus(text, kind) {
+    function cacheStatus(text, kind, pct) {
       cacheEl.textContent = text;
       cacheEl.className = kind || '';
+      if (typeof pct === 'number') {
+        pct = Math.max(0, Math.min(100, pct));
+        fillEl.style.width = pct + '%';
+        pctEl.textContent = Math.round(pct) + '%';
+      } else if (kind === 'ok') {
+        fillEl.style.width = '100%';
+        pctEl.textContent = '100%';
+      }
     }
 
     if (!ac) {
-      cacheStatus('offline cache unavailable', 'bad');
+      cacheStatus('offline cache unavailable', 'bad', 0);
       return;
     }
 
     if (navigator.onLine === false) {
-      cacheStatus('offline - loaded from cache', 'ok');
+      cacheStatus('offline - loaded from cache', 'ok', 100);
     }
 
     ac.addEventListener('checking', function () {
-      cacheStatus('checking offline cache...');
+      cacheStatus('checking offline cache...', '', 0);
     }, false);
     ac.addEventListener('downloading', function () {
-      cacheStatus('saving files for offline use...', 'warn');
+      cacheStatus('saving files for offline use...', 'warn', 1);
     }, false);
     ac.addEventListener('progress', function (event) {
+      var pct = event.total ? (event.loaded / event.total) * 100 : 5;
       var suffix = event.total ? ' (' + event.loaded + '/' + event.total + ')' : '';
-      cacheStatus('saving offline cache' + suffix, 'warn');
+      cacheStatus('saving offline cache' + suffix, 'warn', pct);
     }, false);
     ac.addEventListener('cached', function () {
-      cacheStatus('offline cache ready', 'ok');
+      cacheStatus('offline cache ready', 'ok', 100);
     }, false);
     ac.addEventListener('noupdate', function () {
-      cacheStatus('offline cache ready', 'ok');
+      cacheStatus('offline cache ready', 'ok', 100);
     }, false);
     ac.addEventListener('updateready', function () {
-      cacheStatus('cache updated - reload after this run', 'warn');
+      cacheStatus('cache updated - reload after this run', 'warn', 100);
     }, false);
     ac.addEventListener('obsolete', function () {
-      cacheStatus('offline cache obsolete', 'bad');
+      cacheStatus('offline cache obsolete', 'bad', 0);
     }, false);
     ac.addEventListener('error', function () {
       cacheStatus(navigator.onLine === false ?
         'offline cache active' : 'offline cache failed - keep internet connected',
-        navigator.onLine === false ? 'ok' : 'bad');
+        navigator.onLine === false ? 'ok' : 'bad',
+        navigator.onLine === false ? 100 : 0);
     }, false);
   })();
 
