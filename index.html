@@ -80,6 +80,7 @@
     var shown = 0;
     var timer = null;
     var done = false;
+    var waited = 0;
 
     function render(text, kind, pct) {
       cacheEl.textContent = text;
@@ -113,13 +114,21 @@
 
     render('checking offline cache...', '', 0);
 
-    // Smooth visual progress up to 90% while the browser performs the real
-    // AppCache operation. Real progress events below override this value.
+    // The PS4 browser may omit AppCache progress events. Show honest
+    // progress up to 90%, then explicitly report that the browser is
+    // finalizing instead of leaving an unexplained spinner.
     timer = setInterval(function () {
       if (done) return;
+      waited += 180;
       if (shown < 90) {
         shown += shown < 40 ? 2 : 1;
         render('saving offline cache...', 'warn', shown);
+      } else {
+        render('finalizing offline cache...', 'warn', 90);
+      }
+      if (waited >= 30000 && ac.status === window.applicationCache.DOWNLOADING) {
+        stop();
+        render('cache is still downloading - check server manifest/MIME', 'bad', 90);
       }
     }, 180);
 
