@@ -26,7 +26,7 @@
 </head>
 <body>
 
-    <audio id="bg-music" src="music_background.mp3" autoplay loop></audio>
+    <audio id="bg-music" src="music_background.mp3" preload="auto" loop></audio>
 
     <div id="cache-status" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:50;width:min(680px,86vw);padding:24px 28px;border-radius:18px;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);box-shadow:0 12px 40px rgba(0,0,0,.45);color:#fff;text-align:center;font-family:system-ui,sans-serif;box-sizing:border-box;">
       <div style="font-size:22px;font-weight:800;margin-bottom:10px;">Jailbreak Amine PS4</div>
@@ -72,7 +72,28 @@
                 }
             }
 
-            if (audio) audio.play().catch(function () {});
+            function startMusic() {
+                if (!audio) return;
+                try {
+                    audio.volume = 0.35;
+                    var p = audio.play();
+                    if (p && typeof p.catch === 'function') p.catch(function () {});
+                } catch (e) {}
+            }
+
+            // Start as soon as the cached MP3 is available, and retry while
+            // ApplicationCache is downloading. This is important on PS4 where
+            // the first autoplay attempt can happen before the MP3 is cached.
+            if (audio) {
+                try { audio.load(); } catch (e) {}
+                audio.addEventListener('loadeddata', startMusic, false);
+                audio.addEventListener('canplay', startMusic, false);
+                audio.addEventListener('canplaythrough', startMusic, false);
+                audio.addEventListener('error', function () {
+                    setTimeout(startMusic, 800);
+                }, false);
+                startMusic();
+            }
 
             if (!isPS4) {
                 if (status) status.style.display = 'none';
@@ -87,13 +108,14 @@
             }
 
             ac.addEventListener('checking', function () { setCache('جاري فحص الكاش…', 5); }, false);
-            ac.addEventListener('downloading', function () { setCache('جاري تحميل الكاش… 0%', 8); }, false);
+            ac.addEventListener('downloading', function () { setCache('جاري تحميل الكاش… 0%', 8); startMusic(); }, false);
             ac.addEventListener('progress', function (e) {
                 const pct = e.lengthComputable && e.total ? Math.round((e.loaded / e.total) * 100) : 0;
                 setCache('جاري تحميل الكاش… ' + pct + '%', Math.max(8, pct));
+                if (pct > 0) startMusic();
             }, false);
-            ac.addEventListener('cached', function () { go(); }, false);
-            ac.addEventListener('noupdate', function () { go(); }, false);
+            ac.addEventListener('cached', function () { startMusic(); go(); }, false);
+            ac.addEventListener('noupdate', function () { startMusic(); go(); }, false);
             ac.addEventListener('updateready', function () {
                 try { ac.swapCache(); } catch (e) {}
                 go();

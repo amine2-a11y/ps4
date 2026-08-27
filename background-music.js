@@ -3,7 +3,7 @@
 
   var audio = document.createElement("audio");
   audio.id = "background-music";
-  audio.src = "/music_background.mp3";
+  audio.src = "music_background.mp3";
   audio.loop = true;
   audio.preload = "auto";
   audio.volume = 0.35;
