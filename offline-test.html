@@ -1,6 +1,0 @@
-<!doctype html><html><head><meta charset="utf-8"><title>Offline Cache Test</title><style>body{font-family:sans-serif;text-align:center;padding:40px}#status{font-size:24px;margin:30px}</style></head><body><h1>Offline Cache Test</h1><div id="status">Checking…</div><p id="detail">Testing local storage availability.</p><script>
-(async()=>{const s=document.getElementById('status'),d=document.getElementById('detail');
-try{const k='offline-cache-test-v1';localStorage.setItem(k,'ok');const ok=localStorage.getItem(k)==='ok';localStorage.removeItem(k);if(ok){s.textContent='CACHE READY';d.textContent='Local browser storage is available. This page can be used offline if the hosting/browser cache policy permits it.';}else throw Error('localStorage test failed');}
-catch(e){s.textContent='CACHE FAILED';d.textContent=e&&e.message?e.message:'Storage unavailable';}
-})();
-</script></body></html>
