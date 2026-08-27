@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Jailbreak Amine PS4 • 9.00</title><link rel="stylesheet" href="../theme.css"></head><body><main class="container"><section class="header-section"><h1 class="main-title">Jailbreak Amine PS4 • 9.00</h1><p id="state">PSFree + Lapse</p></section><section id="console" style="max-width:1000px;margin:0 auto;padding:24px;min-height:360px;white-space:pre-wrap;font-family:monospace"><div id="loader" aria-live="polite" style="display:flex;align-items:center;gap:12px;margin-bottom:18px;font-family:system-ui,sans-serif;">
+<span id="spinner" style="width:22px;height:22px;border:3px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;display:none;animation:spin .8s linear infinite"></span>
+<strong id="loadingText">Ready for PS4 9.00…</strong>
+</div>
+<div id="progressWrap" style="display:none;height:8px;background:rgba(255,255,255,.12);border-radius:99px;overflow:hidden;margin:8px 0 18px;">
+<div id="progressBar" style="width:0%;height:100%;transition:width .35s ease;"></div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style></section><div style="max-width:1000px;margin:18px auto;text-align:center"><button id="start" type="button" style="padding:12px 28px;color:white;font-size:18px">START JAILBREAK</button></div></main><script>window.log=function(msg,color){var c=document.getElementById('console');var s=document.createElement('div');s.textContent=msg;s.style.color=color||'#e9f2ff';c.appendChild(s);c.scrollTop=c.scrollHeight;};window.jailbreakSuccess=function(){document.getElementById('state').textContent='Jailbreak complete';};sessionStorage.setItem('payload_path','payload.bin');document.getElementById('start').addEventListener('click',function(){
+  var btn=this, attempt=0, maxAttempts=5, delay=1500;
+  btn.disabled=true;
+  var spin=document.getElementById('spinner'), loadingText=document.getElementById('loadingText'),
+      pw=document.getElementById('progressWrap'), pb=document.getElementById('progressBar');
+  spin.style.display='inline-block'; pw.style.display='block'; pb.style.width='5%';
+  loadingText.textContent='Loading PSFree + Lapse…';
+  window.log('Loading exploit files…','#9cf');
+  var progressTimer=setInterval(function(){
+    var v=parseInt(pb.style.width)||5;
+    if(v<88){ v+=Math.max(1,Math.round((88-v)*0.08)); pb.style.width=v+'%'; }
+  },500);
+  function finishProgress(ok){
+    clearInterval(progressTimer); pb.style.width=ok?'100%':'0%';
+    if(ok){ loadingText.textContent='Jailbreak complete'; spin.style.display='none'; }
+    else { loadingText.textContent='Ready to retry'; spin.style.display='none'; }
+  }
+  function run(){
+    attempt++;
+    window.log('Starting PSFree + Lapse for PS4 9.00… attempt '+attempt+'/'+maxAttempts,'#9cf');
+    try{
+      if(typeof doJailBreak!=='function'){
+        throw new Error('PSFree/Lapse script not loaded.');
+      }
+      Promise.resolve(doJailBreak()).then(function(){
+        window.log('Jailbreak process completed.','#8ff0b0'); finishProgress(true);
+      }).catch(function(e){
+        window.log('PSFree error: '+e,'#ff6b8a');
+        if(attempt<maxAttempts){ window.log('Automatic retry in '+(delay/1000)+'s…','#ffd36b'); setTimeout(run,delay); }
+        else { btn.disabled=false; finishProgress(false); window.log('Retries exhausted. Press START to try again.','#ff6b8a'); }
+      });
+    }catch(e){
+      window.log('PSFree error: '+e,'#ff6b8a');
+      if(attempt<maxAttempts){ window.log('Automatic retry in '+(delay/1000)+'s…','#ffd36b'); setTimeout(run,delay); }
+      else { btn.disabled=false; finishProgress(false); window.log('Retries exhausted. Press START to try again.','#ff6b8a'); }
+    }
+  }
+  run();
+});</script><script src="psfree-lapse/bundle.js"></script><script>
+
+/* Firmware Auto Start dispatcher */
+(function () {
+  "use strict";
+  function fw() {
+    var t = (document.body && document.body.innerText) || "";
+    var m = t.match(/(9\.00|9\.03|9\.04|9\.50|9\.60|10\.00|10\.01|10\.50|10\.70|10\.71|11\.00|11\.02|11\.50|11\.51|11\.52|11\.60|11\.70|11\.80|12\.00|12\.50|12\.70|12\.71|12\.72|13\.00)/);
+    return m ? m[1] : null;
+  }
+  function start() {
+    var selectors = [
+      "#startJailbreak","#start-jailbreak","#start","#jeilbrek",
+      "[data-action='jailbreak']",
+      "button[id*='start' i][id*='jailbreak' i]",
+      "a[id*='start' i][id*='jailbreak' i]"
+    ];
+    for (var i=0;i<selectors.length;i++) {
+      var e=document.querySelector(selectors[i]);
+      if(e && !e.disabled){ try{e.click(); return true;}catch(_){} }
+    }
+    return false;
+  }
+  window.FirmwareAutoStart = { firmware: fw(), start: start };
+  if(document.readyState==="loading")
+    document.addEventListener("DOMContentLoaded",function(){setTimeout(start,300);});
+  else setTimeout(start,300);
+})();
+
+</script>
+</body></html>
