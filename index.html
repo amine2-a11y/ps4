@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PS4 Exploit Chain</title>
+<script src="./bundle.js"></script>
+<style>
+html,body{margin:0;min-height:100%;background:#252526;color:#ddd;font-family:Segoe UI,Tahoma,sans-serif;text-align:center}
+body{background-image:url("bg.jpg");background-size:cover;background-position:center;background-attachment:fixed}
+main{max-width:760px;margin:7vh auto;padding:24px;box-sizing:border-box;background:rgba(30,30,30,.9);border-radius:10px}
+button{margin:18px 0 10px;padding:12px 24px;font-size:18px;font-weight:700;border:0;border-radius:6px;background:#087fbd;color:#fff;cursor:pointer}
+button:disabled{background:#555;color:#aaa;cursor:not-allowed}
+#console{min-height:120px;max-height:42vh;overflow:auto;margin-top:14px;padding:12px;background:#111;border:1px solid #444;border-radius:6px;text-align:left;white-space:pre-wrap;word-break:break-word;font:13px monospace}
+.status{font-size:14px;color:#aaa}.warn{color:#ffcc66}.ok{color:#8fda8f}.err{color:#ff7777}
+footer{margin-top:18px;font-size:12px;color:#888}
+</style>
+</head>
+<body>
+<main>
+<h2>PSFree &amp; Lapse</h2>
+<div class="status" id="status">Checking local files…</div>
+<button id="jailbreakBtn" disabled>Start</button>
+<div><label><input type="checkbox" id="autoRunCheck" checked> Auto start in <span id="countdown">5</span>s</label></div>
+<pre id="console"></pre>
+<footer>UI/cache organization only — bundle.js is unchanged.</footer>
+</main>
+<script>
+(function(){
+'use strict';
+var out=document.getElementById('console'),btn=document.getElementById('jailbreakBtn'),chk=document.getElementById('autoRunCheck'),count=document.getElementById('countdown'),status=document.getElementById('status');
+window.log=function(msg){out.textContent+=(out.textContent?'\n':'')+String(msg);out.scrollTop=out.scrollHeight};
+function setStatus(t,c){status.textContent=t;status.className='status '+(c||'')}
+function localFile(url){return fetch(url,{cache:'only-if-cached'}).then(function(r){return r.ok}).catch(function(){return false})}
+function preflight(){
+ var required=['index.html','bundle.js','ps4jb.cache','cache.html','bg.jpg'];
+ return Promise.all(required.map(localFile)).then(function(ok){
+   var good=ok.every(Boolean), payload=ok[1] && false;
+   if(good){setStatus('Local files ready','ok');btn.disabled=false;log('[READY] Local application files verified.');}
+   else{setStatus('Some local files are missing','warn');log('[WARN] One or more local files could not be verified.');}
+   log('[INFO] Payload file is not included in the supplied ZIP; this wrapper does not create or modify it.');
+   return good;
+ });
+}
+var running=false,timer=null,n=5;
+function start(){if(running)return;running=true;btn.disabled=true;chk.disabled=true;clearInterval(timer);count.textContent='-';out.textContent='';
+ try{if(typeof doJailBreak!=='function')throw new Error('doJailBreak is unavailable'); Promise.resolve(doJailBreak()).catch(function(e){log('[ERROR] '+e);btn.disabled=false;running=false;chk.disabled=false;});}
+ catch(e){log('[ERROR] '+e);btn.disabled=false;running=false;chk.disabled=false;}
+}
+function restart(){clearInterval(timer);if(!chk.checked||btn.disabled){count.textContent='-';return}n=5;count.textContent=n;timer=setInterval(function(){if(!chk.checked||btn.disabled){clearInterval(timer);return}n--;count.textContent=n;if(n<=0){clearInterval(timer);start()}},1000)}
+btn.addEventListener('click',start);chk.addEventListener('change',restart);
+window.addEventListener('error',function(e){log('[ERROR] '+(e.error||e.message||'Unknown error'))});
+window.addEventListener('load',function(){preflight().then(function(ok){if(ok)restart()})});
+})();
+</script>
+</body>
+</html>
