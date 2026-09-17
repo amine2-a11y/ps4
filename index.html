@@ -3,14 +3,26 @@
     <meta charset="utf-8">
     <title>PS4 Jailbreak</title>
     <style>
+      html, body { min-height: 100%; }
       body {
-        background-image: url("bg.jpg");
-        background-repeat: no-repeat;
-        background-size: cover;
-        background-color: #252526;
-        color: #cccccc;
+        margin: 0;
+        background:
+          radial-gradient(circle at 78% 24%, rgba(105,130,105,.16), transparent 26%),
+          radial-gradient(circle at 18% 78%, rgba(55,75,55,.22), transparent 30%),
+          linear-gradient(145deg, #090b09 0%, #171b17 48%, #080a08 100%);
+        background-color: #0b0d0b;
+        color: #d5d9d2;
         font-family: "Segoe UI", Tahoma, sans-serif;
         text-align: center;
+      }
+      body::before {
+        content: ""; position: fixed; inset: 0; pointer-events: none;
+        background: repeating-linear-gradient(135deg, rgba(150,165,150,.025) 0 1px, transparent 1px 7px);
+        opacity: .7;
+      }
+      body::after {
+        content: "☠"; position: fixed; left: 7%; bottom: 4%; pointer-events: none;
+        font-size: 150px; line-height: 1; opacity: .045; transform: rotate(-12deg);
       }
       h2 {
         margin-bottom: 20px;
@@ -30,10 +42,11 @@
         padding: 12px 24px;
         font-size: 18px;
         font-weight: bold;
-        background: #007acc;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
+        background: linear-gradient(#3c4540, #202621);
+        color: #e7ece6;
+        border: 1px solid #667067;
+        border-radius: 5px;
+        box-shadow: inset 0 1px rgba(255,255,255,.12), 0 3px 12px rgba(0,0,0,.35);
         cursor: pointer;
       }
       #jailbreakBtn:disabled {
@@ -41,16 +54,10 @@
         color: #aaaaaa;
         cursor: not-allowed;
       }
-      #jailbreakBtn:not(:disabled):hover {
-        background: #005a9e;
-      }
+      #jailbreakBtn:not(:disabled):hover { background: linear-gradient(#4a554d, #252d28); }
       #hen_logo {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        width: 150px;
-        height: auto;
-        z-index: 1000;
+        position: fixed; top: 16px; right: 16px; width: 150px; height: auto;
+        z-index: 1000; opacity: .92; filter: grayscale(.35) contrast(1.08);
       }
       footer {
         margin-top: 30px;
