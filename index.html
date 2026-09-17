@@ -1,16 +1,17 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>PS4 Jailbreak</title>
+    <title>Lapse Module • Zombie Edition</title>
+    <link rel="preload" as="image" href="zombie_bg.jpg">
+    <link rel="preload" as="image" href="henlogo.png">
     <style>
       html, body { min-height: 100%; }
       body {
         margin: 0;
         background:
-          radial-gradient(circle at 78% 24%, rgba(105,130,105,.16), transparent 26%),
-          radial-gradient(circle at 18% 78%, rgba(55,75,55,.22), transparent 30%),
-          linear-gradient(145deg, #090b09 0%, #171b17 48%, #080a08 100%);
-        background-color: #0b0d0b;
+          linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.72)),
+          url("zombie_bg.jpg") center center / cover fixed no-repeat;
+        background-color: #080a0d;
         color: #d5d9d2;
         font-family: "Segoe UI", Tahoma, sans-serif;
         text-align: center;
@@ -55,6 +56,21 @@
         cursor: not-allowed;
       }
       #jailbreakBtn:not(:disabled):hover { background: linear-gradient(#4a554d, #252d28); }
+
+      #bootOverlay {
+        position: fixed; inset: 0; z-index: 2000; display: flex;
+        align-items: center; justify-content: center;
+        background: #05070a url("zombie_bg.jpg") center / cover no-repeat;
+      }
+      #bootOverlay::after { content:""; position:absolute; inset:0; background:rgba(0,0,0,.68); }
+      .bootBox { position:relative; z-index:1; width:min(82vw,520px); padding:24px;
+        border:1px solid rgba(255,255,255,.18); border-radius:14px;
+        background:rgba(5,8,12,.82); box-shadow:0 10px 40px rgba(0,0,0,.55); }
+      .bootTitle { font-size:24px; font-weight:800; letter-spacing:2px; margin-bottom:10px; }
+      .bootSub { color:#aeb8c4; font-size:14px; margin-bottom:16px; }
+      .bootBar { height:5px; border-radius:5px; overflow:hidden; background:#222a33; }
+      .bootFill { width:0; height:100%; background:#58a6ff; transition:width .2s linear; }
+      .bootFiles { margin-top:14px; color:#cbd5e1; font:12px monospace; line-height:1.8; }
       #hen_logo {
         position: fixed; top: 16px; right: 16px; width: 150px; height: auto;
         z-index: 1000; opacity: .92; filter: grayscale(.35) contrast(1.08);
@@ -72,6 +88,14 @@
     </script>
   </head>
   <body>
+    <div id="bootOverlay" aria-hidden="true">
+      <div class="bootBox">
+        <div class="bootTitle">LAPSE MODULE</div>
+        <div class="bootSub">جاري تحميل ملفات الواجهة بسرعة…</div>
+        <div class="bootBar"><div class="bootFill" id="bootFill"></div></div>
+        <div class="bootFiles" id="bootFiles">[ ] zombie_bg.jpg<br>[ ] henlogo.png<br>[ ] interface</div>
+      </div>
+    </div>
     <h2>PS4 5.05, [6.72 - 9.60] Exploit Chain</h2>
     <div>
       <button id="jailbreakBtn">Start Jailbreak</button>
@@ -89,6 +113,30 @@
     <img src="henlogo.png" id="hen_logo">
   </body>
   <script>
+    // Lightweight UI loader only: preloads visual/interface assets without changing exploit code.
+    (function () {
+      var fill = document.getElementById('bootFill');
+      var files = document.getElementById('bootFiles');
+      var overlay = document.getElementById('bootOverlay');
+      var assets = ['zombie_bg.jpg', 'henlogo.png'];
+      var done = 0;
+      function mark(name) {
+        done++;
+        fill.style.width = Math.round((done / (assets.length + 1)) * 100) + '%';
+        files.innerHTML = '[✓] ' + name + '<br>' + (done >= 1 ? '[✓] interface' : '[ ] interface');
+        if (done >= assets.length) {
+          fill.style.width = '100%';
+          setTimeout(function () { overlay.style.display = 'none'; }, 120);
+        }
+      }
+      assets.forEach(function (src) {
+        var img = new Image();
+        img.onload = function () { mark(src); };
+        img.onerror = function () { mark(src); };
+        img.src = src;
+      });
+    })();
+
     // 6.72 JB globals
     window.entrypoint672_result = 0;
     window.exploitsetup672_result = 0;
