@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" manifest="cache.appcache">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -61,7 +61,7 @@
 <p class="compact-sub">Preparing the page…</p>
 <div class="compact-load"><span></span></div>
 </div></div>
-<div id="brand"><b>  </b></div>
+<div id="brand"><b>AMINE PS4</b></div>
 <div id="wrap">
   <div id="state">detecting firmware...</div>
   <div id="det"></div>
@@ -70,9 +70,17 @@
 
 <script>
 (function(){
+  var cache=window.applicationCache;
   function go(){ location.replace("jb.html?offline=1&v=1352"); }
-  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",function(){setTimeout(go,180)});
-  else setTimeout(go,180);
+  function run(){ setTimeout(go,120); }
+  if(!cache || !document.documentElement.hasAttribute("manifest")){ run(); return; }
+  if(!navigator.onLine){ run(); return; }
+  if(cache.status===cache.IDLE || cache.status===cache.UPDATEREADY){ try{if(cache.status===cache.UPDATEREADY)cache.swapCache();}catch(e){} run(); return; }
+  cache.addEventListener("cached",run,false);
+  cache.addEventListener("noupdate",run,false);
+  cache.addEventListener("error",run,false);
+  cache.addEventListener("obsolete",run,false);
+  setTimeout(run,4000);
 })();
 </script>
 

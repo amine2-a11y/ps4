@@ -164,7 +164,7 @@
 <p class="compact-sub">Preparing the page…</p>
 <div class="compact-load"><span></span></div>
 </div></div>
-    <div id="brand"><b>  </b>
+    <div id="brand"><b>AMINE PS4</b>
     </div>
     <div id="spin"></div>
     <div id="msg">Restart your console</div>
@@ -183,5 +183,14 @@ document.addEventListener('DOMContentLoaded',function(){
   setTimeout(function(){s.classList.add('hide');setTimeout(function(){s.remove()},400)},1250);
 });
 </script>
-<div style="position:fixed;top:10px;left:50%;transform:translateX(-50%);font:700 15px Arial;color:#76ff70;letter-spacing:2px;opacity:.9;pointer-events:none">AMINE PS4</div></body>
+<div style="position:fixed;top:10px;left:50%;transform:translateX(-50%);font:700 15px Arial;color:#76ff70;letter-spacing:2px;opacity:.9;pointer-events:none">AMINE PS4</div><script>
+setTimeout(function(){
+  if(!document.body.classList.contains("done")){
+    var m=document.getElementById("msg");
+    if(m){m.textContent="STILL RUNNING — press X to retry";m.style.display="block";}
+    document.body.classList.add("fail");
+  }
+},45000);
+</script>
+</body>
 </html>
