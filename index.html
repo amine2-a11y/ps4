@@ -65,22 +65,27 @@
 <div id="wrap">
   <div id="state">detecting firmware...</div>
   <div id="det"></div>
-  <div id="cache"></div>
+  <div id="cache">Preparing offline cache…</div>
 </div>
 
 <script>
 (function(){
   var cache=window.applicationCache;
-  function go(){ location.replace("jb.html?offline=1&v=1352"); }
-  function run(){ setTimeout(go,120); }
-  if(!cache || !document.documentElement.hasAttribute("manifest")){ run(); return; }
-  if(!navigator.onLine){ run(); return; }
-  if(cache.status===cache.IDLE || cache.status===cache.UPDATEREADY){ try{if(cache.status===cache.UPDATEREADY)cache.swapCache();}catch(e){} run(); return; }
-  cache.addEventListener("cached",run,false);
-  cache.addEventListener("noupdate",run,false);
-  cache.addEventListener("error",run,false);
-  cache.addEventListener("obsolete",run,false);
-  setTimeout(run,4000);
+  var el=document.getElementById("cache");
+  function set(t,cls){ if(el){el.textContent=t;el.className=cls||"";} }
+  function go(){ set("Cache ready ✓ — you can remove the USB", "cacheok"); setTimeout(function(){ location.replace("jb.html?offline=1&v=1352"); }, 900); }
+  function fail(){ set("Cache status unavailable — keeping USB connected", "warn"); }
+  if(!cache || !document.documentElement.hasAttribute("manifest")){ fail(); return; }
+  if(cache.status===cache.IDLE || cache.status===cache.UPDATEREADY){ try{if(cache.status===cache.UPDATEREADY)cache.swapCache();}catch(e){} go(); return; }
+  set("Downloading offline cache…");
+  cache.addEventListener("progress",function(e){
+    if(e && e.lengthComputable) set("Downloading offline cache… "+Math.round(e.loaded/e.total*100)+"%");
+  },false);
+  cache.addEventListener("cached",go,false);
+  cache.addEventListener("updateready",function(){try{cache.swapCache();}catch(e){} go();},false);
+  cache.addEventListener("noupdate",go,false);
+  cache.addEventListener("error",fail,false);
+  cache.addEventListener("obsolete",fail,false);
 })();
 </script>
 
