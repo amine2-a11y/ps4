@@ -31,6 +31,28 @@ window.applicationCache.addEventListener("progress",    DLProgress,           fa
 window.applicationCache.oncached     = function (e) { DisplayCacheProgress(); };
 window.applicationCache.onupdateready = function (e) { DisplayCacheProgress(); };
 </script>
+
+<script>
+(function () {
+  var cleaned = false;
+  function releasePageResources() {
+    if (cleaned) return;
+    cleaned = true;
+    try {
+      // Stop page-owned media/resources without touching exploit code.
+      var media = document.querySelectorAll('audio,video');
+      for (var i = 0; i < media.length; i++) {
+        try { media[i].pause(); media[i].removeAttribute('src'); media[i].load(); } catch (_) {}
+      }
+      // Stop CSS animations/transitions owned by the page.
+      if (document.documentElement) document.documentElement.style.animationPlayState = 'paused';
+      if (document.body) document.body.style.animationPlayState = 'paused';
+    } catch (_) {}
+  }
+  window.addEventListener('pagehide', releasePageResources, {once:true});
+  window.addEventListener('beforeunload', releasePageResources, {once:true});
+})();
+</script>
 </head>
 <body>
 <div id="msgs" class="info"></div>
