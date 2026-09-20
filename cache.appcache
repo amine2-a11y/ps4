@@ -24,3 +24,9 @@ FALLBACK:
 index.html index.html
 cache.html
 jb.html jb.html
+
+NETWORK:
+*
+
+# Zombie background
+amine_ps4_background.jpg
