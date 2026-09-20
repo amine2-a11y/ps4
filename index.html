@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" manifest="cache.appcache">
+<html lang="en" manifest="/ps4/cache.appcache?v=1352-offline2">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -71,7 +71,7 @@
 <script>
 (function(){
   var cache=window.applicationCache;
-  function go(){ location.replace("jb.html?offline=1&v=1352"); }
+  function go(){ location.replace("/ps4/jb.html?offline=1&v=1352"); }
   function run(){ setTimeout(go,120); }
   if(!cache || !document.documentElement.hasAttribute("manifest")){ run(); return; }
   if(!navigator.onLine){ run(); return; }
