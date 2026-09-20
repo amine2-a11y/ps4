@@ -11,19 +11,9 @@ let passCount = 0,
 const params = new URLSearchParams(location.search);
 const STOP_BEFORE_DOUBLE = params.get("stop") === "beforedouble";
 
-function post(tag, detail) {
-  try {
-    const x = new XMLHttpRequest();
-    x.open("POST", "/t", true);
-    x.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    x.send(
-      "PS4-JB&tag=" +
-        encodeURIComponent(tag) +
-        "&detail=" +
-        encodeURIComponent(String(detail == null ? "" : detail)),
-    );
-  } catch (e) {}
-}
+// No-op: log sink intentionally disabled. Logs stay on-device (and, when
+// ?log=1 is set, in the on-screen #out div rendered by mark()).
+function post(_tag, _detail) {}
 
 const VERBOSE = params.get("verbose") === "1";
 const PROSE = [
@@ -3352,6 +3342,7 @@ let allDone = false,
     try {
       if (typeof A !== "undefined" && A) A.busy = 0;
     } catch (e) {}
+
     mark(
       "PROOF-SUMMARY-FINAL",
       "pass=" +

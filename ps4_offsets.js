@@ -562,12 +562,12 @@ PS4["13.52"] = Object.assign({}, PS4["13.50"], {
 
   kpatch: "1352.bin",
 
-  payload: "goldhen.bin",
+  payload: "payload2.bin",
   fw_status:
     "state=663-LIVE-on-hardware shares=13.50 (webkit+libkernel) " +
     "kernel_rvas=MEASURED-from-kernel_1352.elf (kdump5 tier1 36MB pass=39/0, " +
     "kderive 16/16 recipes) kpatch=1352.bin-24-sites-verified-OFFLINE-ONLY " +
-    "payload=goldhen.bin-INTEGRATION-TEST " +
+    "payload=payload2.bin-PS4HEN-native-1352 (patched-GoldHEN KP'd 2/2) " +
     "bug=663",
 });
 
