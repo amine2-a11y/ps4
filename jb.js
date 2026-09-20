@@ -243,7 +243,7 @@ let allDone = false,
     // the benign, detectable misses.
     const RETRY_MAX = params.get("retry")
       ? parseInt(params.get("retry"), 10)
-      : 5;
+      : 8;
     const RETRY_KEY = "jb1352-read-retry";
     const retryCount = () => {
       try {
@@ -283,7 +283,7 @@ let allDone = false,
         try {
           location.reload();
         } catch (e) {}
-      }, 250);
+      }, 400);
       return true;
     };
     if (retryCount() > 0)
