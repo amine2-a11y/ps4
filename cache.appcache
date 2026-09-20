@@ -1,5 +1,5 @@
 CACHE MANIFEST
-# AMINE PS4 OFFLINE 13.52 v3
+# AMINE PS4 OFFLINE 13.52 GoldHEN test
 CACHE:
 index.html
 jb.html
@@ -10,8 +10,6 @@ int64.js
 ps4_offsets.js
 rpc_worker.js
 youth-theme.css
-zombie-theme.css
-zombie-start.css
 payload2.bin
 goldhen.bin
 patches/1302.bin
