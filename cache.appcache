@@ -1,0 +1,21 @@
+CACHE MANIFEST
+# rev 20260920-offline-hen-v5
+
+CACHE:
+index.html
+cache.html
+jb.html
+jb.js
+core.js
+mem.js
+int64.js
+ps4_offsets.js
+rpc_worker.js
+payload2.bin
+patches/1302.bin
+patches/1350.bin
+patches/1352.bin
+amine_ps4_background.jpg
+
+NETWORK:
+*
