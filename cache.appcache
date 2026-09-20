@@ -10,7 +10,10 @@ int64.js
 ps4_offsets.js
 rpc_worker.js
 youth-theme.css
+zombie-theme.css
+zombie-start.css
 payload2.bin
+goldhen.bin
 patches/1302.bin
 patches/1350.bin
 patches/1352.bin

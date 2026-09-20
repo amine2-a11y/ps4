@@ -1,14 +1,14 @@
-PS4 Offline Host — local package
+PS4 Offline 13.52 — AminePS4 GoldHEN integration test
 
-This package is prepared from the supplied project for offline hosting.
-
-Included locally:
+Offline assets included locally:
 - index.html / jb.html
-- exploit JS modules
-- payload2.bin
-- firmware patch blobs: 13.02, 13.50, 13.52
-- local youth-theme.css
-- offline application cache manifest
+- jb.js and local JS modules
+- patches/1352.bin (13.52 profile)
+- goldhen.bin (integration-test payload supplied by user)
+- payload2.bin retained as the original fallback payload
+- application cache manifest containing all runtime assets
 
-The UI advertises only firmware versions for which this package contains a local patch blob.
-No claim is made that the supplied payload constitutes GoldHEN; that must be verified on hardware.
+The 13.52 profile in ps4_offsets.js selects patches/1352.bin and goldhen.bin.
+No network asset is required after the browser has successfully populated the application cache.
+
+Important: static packaging does not prove that the supplied goldhen.bin is compatible with 13.52 hardware. Test results must be verified on the console.
