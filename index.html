@@ -40,6 +40,28 @@ body:after{
         window.location.replace("cache.html");
     }
     </script>
+
+<script>
+(function () {
+  var cleaned = false;
+  function releasePageResources() {
+    if (cleaned) return;
+    cleaned = true;
+    try {
+      // Stop page-owned media/resources without touching exploit code.
+      var media = document.querySelectorAll('audio,video');
+      for (var i = 0; i < media.length; i++) {
+        try { media[i].pause(); media[i].removeAttribute('src'); media[i].load(); } catch (_) {}
+      }
+      // Stop CSS animations/transitions owned by the page.
+      if (document.documentElement) document.documentElement.style.animationPlayState = 'paused';
+      if (document.body) document.body.style.animationPlayState = 'paused';
+    } catch (_) {}
+  }
+  window.addEventListener('pagehide', releasePageResources, {once:true});
+  window.addEventListener('beforeunload', releasePageResources, {once:true});
+})();
+</script>
 </head>
 <body>
     ☠ AMINE PS4 ·  ☠<br>
@@ -147,22 +169,5 @@ body:after{
         }, false);
     }
 })();
-    <script>
-    // Safe lifecycle cleanup for the host page.
-    // Does not modify exploit/payload code.
-    (function () {
-        function cleanup() {
-            try {
-                var media = document.querySelectorAll("audio,video");
-                for (var i = 0; i < media.length; i++) {
-                    try { media[i].pause(); } catch (e) {}
-                    try { media[i].removeAttribute("src"); media[i].load(); } catch (e) {}
-                }
-            } catch (e) {}
-        }
-        window.addEventListener("pagehide", cleanup, false);
-        window.addEventListener("beforeunload", cleanup, false);
-    })();
-    </script>
-</body>
+</script>
 </html>

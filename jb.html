@@ -29,7 +29,29 @@ body.log #out{display:block;white-space:pre-wrap;font:12px/1.45 Consolas,monospa
 .ok,.safe{color:#d9ff92}.bad,.danger{color:#ffaaa0}.warn{color:#fff09a}code{color:#d7efb4}
 @keyframes spin{to{transform:rotate(360deg)}}@keyframes fog{from{transform:translateX(-2%) scale(1)}to{transform:translateX(2%) translateY(2%) scale(1.08)}}
 </style>
-  </head>
+  
+<script>
+(function () {
+  var cleaned = false;
+  function releasePageResources() {
+    if (cleaned) return;
+    cleaned = true;
+    try {
+      // Stop page-owned media/resources without touching exploit code.
+      var media = document.querySelectorAll('audio,video');
+      for (var i = 0; i < media.length; i++) {
+        try { media[i].pause(); media[i].removeAttribute('src'); media[i].load(); } catch (_) {}
+      }
+      // Stop CSS animations/transitions owned by the page.
+      if (document.documentElement) document.documentElement.style.animationPlayState = 'paused';
+      if (document.body) document.body.style.animationPlayState = 'paused';
+    } catch (_) {}
+  }
+  window.addEventListener('pagehide', releasePageResources, {once:true});
+  window.addEventListener('beforeunload', releasePageResources, {once:true});
+})();
+</script>
+</head>
   <body>
     <div id="brand">
       <b>☠ AMINE PS4 · E ☠</b>
@@ -40,28 +62,6 @@ body.log #out{display:block;white-space:pre-wrap;font:12px/1.45 Consolas,monospa
       <div id="state"></div>
       <div id="out"></div>
     </div>
-    <script>
-      // Safe page-lifecycle cleanup: release UI/media resources when leaving the page.
-      // This does not alter exploit, payload, kernel patches, or offsets.
-      (function () {
-        var cleaned = false;
-        function cleanupPageResources() {
-          if (cleaned) return;
-          cleaned = true;
-          try {
-            document.documentElement.style.animation = "none";
-            document.body.style.animation = "none";
-            var media = document.querySelectorAll("audio,video");
-            for (var i = 0; i < media.length; i++) {
-              try { media[i].pause(); } catch (e) {}
-              try { media[i].removeAttribute("src"); media[i].load(); } catch (e) {}
-            }
-          } catch (e) {}
-        }
-        window.addEventListener("pagehide", cleanupPageResources, false);
-        window.addEventListener("beforeunload", cleanupPageResources, false);
-      })();
-    </script>
     <script type="module">
       import "./jb.js?v=10";
     </script>
