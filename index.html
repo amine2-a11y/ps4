@@ -15,31 +15,13 @@ body{
  font:16px/1.5 monospace;
  position:relative;
 }
-body:before{
- content:""; position:fixed; inset:-20%;
- background:
-   radial-gradient(ellipse at 30% 60%,rgba(220,255,210,.16),transparent 35%),
-   radial-gradient(ellipse at 70% 35%,rgba(255,255,210,.13),transparent 30%);
- filter:blur(10px); animation:fog 14s ease-in-out infinite alternate;
- pointer-events:none;
-}
-body:after{
- content:"☠    ☠"; position:fixed; left:0; right:0; bottom:8px;
- text-align:center; color:rgba(235,255,220,.30); font-size:12px;
- letter-spacing:7px; pointer-events:none;
-}
 #console{
  position:relative; z-index:1; margin:0; padding:25vh 8vw;
  white-space:pre-wrap; text-shadow:0 2px 8px #102515;
 }
 .ok{color:#d8ff9a}.bad{color:#ffb0a0}.warn{color:#fff09a}
-@keyframes fog{from{transform:translate3d(-2%,0,0) scale(1)}to{transform:translate3d(2%,2%,0) scale(1.08)}}
 </style>
-    <script>
-    if (window.applicationCache && window.applicationCache.status == 0) {
-        window.location.replace("cache.html");
-    }
-    </script>
+    <!-- Do not redirect to cache.html based on status 0: that can create a loop. -->
 </head>
 <body>
     ☠ AMINE PS4 ·  ☠<br>
@@ -59,6 +41,10 @@ body:after{
     }
 
     var params = new URLSearchParams(location.search);
+    if (params.get("cacheReady") === "1") {
+        print("cache ready — AMINE PS4 page opened", "ok");
+        return;
+    }
 
     // Firmwares with measured kernel table — KEEP IN SYNC with ps4_offsets.js
     var SUPPORTED = { 1302: 1, 1304: 1, 1350: 1, 1352: 1 };
