@@ -1,67 +1,88 @@
-<!-- ☠ 2026 AMINE PS4  — PS4 Exploit -->
-<html manifest="cache.appcache">
+<!DOCTYPE html>
+<html lang="en" manifest="cache.appcache">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>AMINE PS4</title>
-    
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>  </title>
 <style>
-*{box-sizing:border-box}
-html,body{min-height:100%}
-body{
- margin:0; min-height:100vh; overflow:hidden;
- background: linear-gradient(rgba(0,8,18,.08),rgba(0,8,18,.20)), url("amine_ps4_background.jpg") center/cover no-repeat;
- color:#f0ffe9;
- font:16px/1.5 monospace;
- position:relative;
-}
-body:before{
- content:""; position:fixed; inset:-20%;
- background:
-   radial-gradient(ellipse at 30% 60%,rgba(220,255,210,.16),transparent 35%),
-   radial-gradient(ellipse at 70% 35%,rgba(255,255,210,.13),transparent 30%);
- filter:blur(10px); animation:fog 14s ease-in-out infinite alternate;
- pointer-events:none;
-}
-body:after{
- content:"☠    ☠"; position:fixed; left:0; right:0; bottom:8px;
- text-align:center; color:rgba(235,255,220,.30); font-size:12px;
- letter-spacing:7px; pointer-events:none;
-}
-#console{
- position:relative; z-index:1; margin:0; padding:25vh 8vw;
- white-space:pre-wrap; text-shadow:0 2px 8px #102515;
-}
-.ok{color:#d8ff9a}.bad{color:#ffb0a0}.warn{color:#fff09a}
-@keyframes fog{from{transform:translate3d(-2%,0,0) scale(1)}to{transform:translate3d(2%,2%,0) scale(1.08)}}
+  html, body { margin:0; padding:0; background:#0b0d10; color:#c8ced8;
+               font:15px/1.45 "Segoe UI", system-ui, sans-serif; }
+  #wrap { padding:16px 18px; }
+  #state { font-size:22px; font-weight:700; margin:0 0 6px; }
+  #det { font-size:13px; color:#8b95a3; margin:0 0 4px; }
+  #det b { color:#c8ced8; font-weight:600; }
+  #cache { font-size:12px; color:#5c6672; margin:0 0 10px; min-height:14px; }
+  #cache.cacheok { color:#7fd0a0; }
+  .ok { color:#7fd0a0; } .bad { color:#d08a7f; } .warn { color:#d8c07f; }
+  #brand { text-align:center; padding:8px 10px; background:#0e1116;
+           border-bottom:1px solid #1e2732; }
+  #brand img { width:28px; height:28px; margin-right:8px; border-radius:50%;
+               vertical-align:middle; }
+  #brand b { font-size:15px; font-weight:700; letter-spacing:.14em;
+             color:#e6ebf2; vertical-align:middle; }
 </style>
-    <script>
-    if (window.applicationCache && window.applicationCache.status == 0) {
-        window.location.replace("cache.html");
-    }
-    </script>
+  <link rel="stylesheet" href="youth-theme.css">
+<style>
+/* Compact startup screen */
+#compact-start{
+  position:fixed; inset:0; z-index:99999;
+  display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg,#090d1c,#17133b);
+  transition:opacity .35s ease,visibility .35s ease;
+}
+#compact-start.hide{opacity:0;visibility:hidden;pointer-events:none}
+.compact-card{
+  width:min(86vw,330px); padding:24px 18px; text-align:center;
+  border-radius:22px; background:rgba(20,27,52,.94);
+  box-shadow:0 18px 50px rgba(0,0,0,.45);
+}
+.compact-logo{
+  width:58px;height:58px;margin:0 auto 13px;border-radius:17px;
+  display:grid;place-items:center;font-weight:800;font-size:24px;
+  background:linear-gradient(135deg,#7c5cff,#00d4ff);color:white;
+}
+.compact-title{font-size:21px;font-weight:800;color:#fff;margin:0 0 6px}
+.compact-sub{font-size:13px;color:#aab3cf;margin:0 0 18px}
+.compact-load{
+  height:5px;border-radius:99px;overflow:hidden;background:#252d4d
+}
+.compact-load span{
+  display:block;height:100%;width:0;
+  background:linear-gradient(90deg,#7c5cff,#00d4ff);
+  animation:compactLoading 1.15s ease forwards;
+}
+@keyframes compactLoading{to{width:100%}}
+</style>
 </head>
-<body>
-    ☠ AMINE PS4 ·  ☠<br>
-    ☠ 2026 AMINE PS4 <br>
-    <br>
-    <pre id="console"></pre>
-</body>
+<body><div id="compact-start">
+<div class="compact-card">
+<div class="compact-logo">PS4</div>
+<h2 class="compact-title">Starting</h2>
+<p class="compact-sub">Preparing the page…</p>
+<div class="compact-load"><span></span></div>
+</div></div>
+<div id="brand"><b>  </b></div>
+<div id="wrap">
+  <div id="state">detecting firmware...</div>
+  <div id="det"></div>
+  <div id="cache"></div>
+</div>
+
 <script>
 (function () {
-    var con = document.getElementById("console");
-
-    function print(msg, cls) {
-        var span = document.createElement("span");
-        if (cls) span.className = cls;
-        span.textContent = msg + "\n";
-        con.appendChild(span);
-    }
-
+    var stateEl = document.getElementById("state");
+    var detEl = document.getElementById("det");
+    var cacheEl = document.getElementById("cache");
+    function setState(t, c) { stateEl.textContent = t; stateEl.className = c || ""; }
+    function setCache(t, ok) { cacheEl.textContent = t; cacheEl.className = ok ? "cacheok" : ""; }
     var params = new URLSearchParams(location.search);
 
-    // Firmwares with measured kernel table — KEEP IN SYNC with ps4_offsets.js
-    var SUPPORTED = { 1302: 1, 1304: 1, 1350: 1, 1352: 1 };
+    // Firmwares this build has a MEASURED kernel table for. jb.js still runs its
+    // own kernel-table-present gate, so this is UX only -- an unlisted firmware
+    // can still be launched with a tap. KEEP IN SYNC with ps4_offsets.js: add a
+    // fwnum here in the SAME commit that fills that firmware's kernel RVAs.
+    // The PS4 reports its minor as two hex digits in the UA (13.52 -> minor 0x52).
+    var SUPPORTED = { 1302: 1, 1350: 1, 1352: 1 }; // all measured on hardware
 
     var key = null, fwnum = null;
     var m = /PlayStation\s+4[\/ ](\d+)\.(\d+)/.exec(navigator.userAgent);
@@ -72,33 +93,31 @@ body:after{
         fwnum = parseInt(m[1], 10) * 100 + parseInt(ms, 10);
     }
 
-    var forced    = params.get("force") === "1";
+    var forced = params.get("force") === "1";
     var supported = forced || (fwnum !== null && SUPPORTED[fwnum] === 1);
-
-    print("firmware: " + (key || "unknown"));
-    print("supported: " + (supported ? "yes" : "no"), supported ? "ok" : "bad");
+    detEl.innerHTML = "firmware <b>" + (key || "unknown") + "</b>"
+        + (supported ? " &middot; <b>supported</b>"
+                     : " &middot; not in this build's kernel table");
 
     var target = "jb.html" + location.search;
-
-    function go() {
-        print("loading exploit...", "warn");
-        location.replace(target);
-    }
+    function go() { setState("loading jailbreak...", "warn"); location.replace(target); }
 
     function waitForTap(msg, action) {
-        print(msg, "warn");
+        setState(msg, "warn");
         function fire() {
-            window.removeEventListener("click",   fire);
+            window.removeEventListener("click", fire);
             window.removeEventListener("keydown", fire);
             action();
         }
-        window.addEventListener("click",   fire);
+        window.addEventListener("click", fire);
         window.addEventListener("keydown", fire);
     }
 
+    // Off-target consoles are not launched automatically -- one tap still runs
+    // it, so a user-agent quirk on the real 13.52 console can never lock it out.
     if (!supported) {
-        print("UNSUPPORTED FIRMWARE — tap / press X to run anyway", "bad");
-        waitForTap("", go);
+        setState("UNSUPPORTED FIRMWARE", "bad");
+        waitForTap("UNSUPPORTED (" + (key || "unknown") + ") -- press X or tap to run anyway", go);
         return;
     }
 
@@ -106,63 +125,56 @@ body:after{
     if (!ac || !document.documentElement.hasAttribute("manifest")) {
         go();
     } else if (!navigator.onLine) {
-        print("offline — running from cache", "ok");
+        setCache("offline -- from cache", true);
         go();
     } else if (ac.status === ac.IDLE) {
-        print("cached", "ok");
+        setCache("cached", true);
         go();
     } else if (ac.status === ac.UPDATEREADY) {
         try { ac.swapCache(); } catch (e) {}
-        print("update downloaded", "ok");
-        waitForTap("UPDATE READY — tap / press X to reload", function () { location.reload(); });
+        setCache("update downloaded", true);
+        waitForTap("UPDATE READY -- press X or tap to reload & run",
+                   function () { location.reload(); });
     } else {
-        print("checking cache...");
+        setCache("checking cache...");
         ac.addEventListener("downloading",
-            function () { print("caching for offline (first run)..."); }, false);
+            function () { setCache("caching for offline (first run)..."); }, false);
         ac.addEventListener("progress", function (e) {
             if (e && e.total)
-                print("caching " + Math.round((e.loaded / e.total) * 100) + "%");
+                setCache("caching " + Math.round((e.loaded / e.total) * 100) + "%");
         }, false);
         ac.addEventListener("cached", function () {
-            print("cached for offline use", "ok");
-            waitForTap("CACHED — tap / press X to run", go);
+            setCache("cached for offline use", true);
+            waitForTap("CACHED (first run) -- press X or tap to run", go);
         }, false);
         ac.addEventListener("updateready", function () {
             try { ac.swapCache(); } catch (e) {}
-            print("update downloaded", "ok");
-            waitForTap("UPDATE READY — tap / press X to reload",
+            setCache("update downloaded", true);
+            waitForTap("UPDATE READY -- press X or tap to reload & run",
                        function () { location.reload(); });
         }, false);
         ac.addEventListener("noupdate", function () {
-            print("cached — offline ready", "ok");
+            setCache("cached -- offline ready", true);
             go();
         }, false);
         ac.addEventListener("error", function () {
-            print("cache unavailable");
-            waitForTap("CACHE FAILED — tap / press X to run anyway", go);
+            setCache("cache unavailable");
+            waitForTap("CACHE FAILED -- press X or tap to run anyway", go);
         }, false);
         ac.addEventListener("obsolete", function () {
-            print("cache obsolete");
-            waitForTap("CACHE OBSOLETE — tap / press X to run", go);
+            setCache("cache obsolete");
+            waitForTap("CACHE OBSOLETE -- press X or tap to run", go);
         }, false);
     }
 })();
-    <script>
-    // Safe lifecycle cleanup for the host page.
-    // Does not modify exploit/payload code.
-    (function () {
-        function cleanup() {
-            try {
-                var media = document.querySelectorAll("audio,video");
-                for (var i = 0; i < media.length; i++) {
-                    try { media[i].pause(); } catch (e) {}
-                    try { media[i].removeAttribute("src"); media[i].load(); } catch (e) {}
-                }
-            } catch (e) {}
-        }
-        window.addEventListener("pagehide", cleanup, false);
-        window.addEventListener("beforeunload", cleanup, false);
-    })();
-    </script>
-</body>
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  var s=document.getElementById('compact-start');
+  if(!s)return;
+  setTimeout(function(){s.classList.add('hide');setTimeout(function(){s.remove()},400)},1250);
+});
+</script>
+<div style="position:fixed;top:10px;left:50%;transform:translateX(-50%);font:700 15px Arial;color:#76ff70;letter-spacing:2px;opacity:.9;pointer-events:none">AMINE PS4</div></body>
 </html>
